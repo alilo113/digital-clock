@@ -1,1 +1,1 @@
-# digital-clock
+<b>a simple digital clock</b>
