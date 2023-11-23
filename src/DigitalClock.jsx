@@ -20,6 +20,20 @@ export function DigitalClock() {
 
   function stopClock() {
     clearInterval(intervalId);
+    setIntervalId(null)
+  }
+
+  function startClock() {
+    if (intervalId === null) {
+      const interval = setInterval(() => {
+        const newTime = new Date();
+        const hours = newTime.getHours().toString().padStart(2, '0');
+        const minutes = newTime.getMinutes().toString().padStart(2, '0');
+        const seconds = newTime.getSeconds().toString().padStart(2, '0');
+        setTime({ hours, minutes, seconds });
+      }, 1000);
+      setIntervalId(interval);
+    }
   }
 
   const { hours, minutes, seconds } = time;
@@ -37,6 +51,12 @@ export function DigitalClock() {
           onClick={stopClock}
         >
           Stop
+        </button>
+        <button
+          className="bg-red-500 text-white px-4 py-2 rounded-md ml-4"
+          onClick={startClock}
+        >
+          Start
         </button>
       </div>
     </div>
