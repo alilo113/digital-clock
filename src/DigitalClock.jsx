@@ -1,28 +1,26 @@
-import { useState,  } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export function DigitalClock() {
   const [time, setTime] = useState({ hours: '00', minutes: '00', seconds: '00' });
-  let intervalId = null;
+  const [intervalId, setIntervalId] = useState(null); // State to hold interval ID
 
-  const updateTime = () => {
-    const newTime = new Date();
-    const hours = newTime.getHours().toString().padStart(2, '0');
-    const minutes = newTime.getMinutes().toString().padStart(2, '0');
-    const seconds = newTime.getSeconds().toString().padStart(2, '0');
-    setTime({ hours, minutes, seconds });
-  };
-  
-  setInterval(updateTime, 1000);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newTime = new Date();
+      const hours = newTime.getHours().toString().padStart(2, '0');
+      const minutes = newTime.getMinutes().toString().padStart(2, '0');
+      const seconds = newTime.getSeconds().toString().padStart(2, '0');
+      setTime({ hours, minutes, seconds });
+    }, 1000); 
 
-  const stopClock = () => {
+    setIntervalId(interval);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  function stopClock() {
     clearInterval(intervalId);
-  };
-
-  const resetClock = () => {
-    clearInterval(intervalId);
-    setTime({ hours: '00', minutes: '00', seconds: '00' });
-    intervalId = setInterval(updateTime, 1000);
-  };
+  }
 
   const { hours, minutes, seconds } = time;
 
@@ -39,12 +37,6 @@ export function DigitalClock() {
           onClick={stopClock}
         >
           Stop
-        </button>
-        <button
-          className="bg-yellow-500 text-white px-4 py-2 rounded-md ml-4"
-          onClick={resetClock}
-        >
-          Reset
         </button>
       </div>
     </div>
