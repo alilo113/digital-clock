@@ -1,8 +1,8 @@
-import { DigitalClock } from "./DigitalClock"
+import { PomodoroClock } from "./DigitalClock"
 
 function App() {
   return (
-    <DigitalClock/>
+    <PomodoroClock/>
   )
 }
 

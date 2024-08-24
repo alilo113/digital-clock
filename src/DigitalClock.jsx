@@ -1,62 +1,65 @@
 import React, { useState, useEffect } from 'react';
 
-export function DigitalClock() {
-  const [time, setTime] = useState({ hours: '00', minutes: '00', seconds: '00' });
-  const [intervalId, setIntervalId] = useState(null); // State to hold interval ID
+export function PomodoroClock() {
+  const [timeLeft, setTimeLeft] = useState(25 * 60); // Start with 25 minutes in seconds
+  const [isActive, setIsActive] = useState(false); // Track if the timer is active
+  const [isBreak, setIsBreak] = useState(false); // Track if it's break time
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const newTime = new Date();
-      const hours = newTime.getHours().toString().padStart(2, '0');
-      const minutes = newTime.getMinutes().toString().padStart(2, '0');
-      const seconds = newTime.getSeconds().toString().padStart(2, '0');
-      setTime({ hours, minutes, seconds });
-    }, 1000); 
+    let interval = null;
 
-    setIntervalId(interval);
+    if (isActive && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((timeLeft) => timeLeft - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      clearInterval(interval);
+      if (isBreak) {
+        setTimeLeft(25 * 60); // Reset to 25 minutes
+        setIsBreak(false); // Switch to work time
+      } else {
+        setTimeLeft(5 * 60); // Switch to 5-minute break
+        setIsBreak(true);
+      }
+    }
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isActive, timeLeft, isBreak]);
 
-  function stopClock() {
-    clearInterval(intervalId);
-    setIntervalId(null)
-  }
+  const toggleTimer = () => {
+    setIsActive(!isActive);
+  };
 
-  function startClock() {
-    if (intervalId === null) {
-      const interval = setInterval(() => {
-        const newTime = new Date();
-        const hours = newTime.getHours().toString().padStart(2, '0');
-        const minutes = newTime.getMinutes().toString().padStart(2, '0');
-        const seconds = newTime.getSeconds().toString().padStart(2, '0');
-        setTime({ hours, minutes, seconds });
-      }, 1000);
-      setIntervalId(interval);
-    }
-  }
+  const resetTimer = () => {
+    setIsActive(false);
+    setIsBreak(false);
+    setTimeLeft(25 * 60); // Reset to 25 minutes
+  };
 
-  const { hours, minutes, seconds } = time;
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60).toString().padStart(2, '0');
+    const seconds = (time % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  };
 
   return (
-    <div className="bg-blue-900 h-screen flex justify-center items-center">
-      <div className="con text-white font-serif text-5xl">
-        <span id="hou">{hours}</span>
-        <span className="mx-1">:</span>
-        <span id="min">{minutes}</span>
-        <span className="mx-1">:</span>
-        <span id="sec">{seconds}</span>
+    <div className="bg-gray-900 h-screen flex justify-center items-center">
+      <div className="text-white font-serif text-5xl text-center">
+        <div>{isBreak ? 'Break Time!' : 'Work Time!'}</div>
+        <div className="mt-4">{formatTime(timeLeft)}</div>
         <button
-          className="bg-red-500 text-white px-4 py-2 rounded-md ml-4"
-          onClick={stopClock}
+          className={`${
+            isActive ? 'bg-red-500' : 'bg-green-500'
+          } text-white px-4 py-2 rounded-md mt-4`}
+          onClick={toggleTimer}
         >
-          Stop
+          {isActive ? 'Pause' : 'Start'}
         </button>
         <button
-          className="bg-red-500 text-white px-4 py-2 rounded-md ml-4"
-          onClick={startClock}
+          className="bg-yellow-500 text-white px-4 py-2 rounded-md mt-4 ml-4"
+          onClick={resetTimer}
         >
-          Start
+          Reset
         </button>
       </div>
     </div>
